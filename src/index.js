@@ -9,7 +9,8 @@ export async function setupENS({
   reloadOnAccountsChange,
   enforceReadOnly,
   enforceReload,
-  infura
+  infura,
+  topLevelDomain = 'bch'
 } = {}) {
   const { provider } = await setupWeb3({
     customProvider,
@@ -20,7 +21,7 @@ export async function setupENS({
   })
   const networkId = await getNetworkId()
   const ens = new ENS({ provider, networkId, registryAddress: ensAddress })
-  const registrar = await setupRegistrar(ens.registryAddress)
+  const registrar = await setupRegistrar(ens.registryAddress, topLevelDomain)
   const network = await getNetwork()
   return { ens, registrar, provider:customProvider, network, providerObject: provider }
 }

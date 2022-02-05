@@ -19,6 +19,11 @@ import { namehash } from './namehash'
 
 //import { checkLabelHash } from '../updaters/preImageDB'
 
+const supportedTopLevelDomains = ['eth', 'bch']
+const topLevelDomainSupported = (tld) => {
+  return tld && supportedTopLevelDomains.indexOf(tld.toLowerCase()) !== -1;
+}
+
 const uniq = (a, param) =>
   a.filter(
     (item, pos) => a.map(mapItem => mapItem[param]).indexOf(item[param]) === pos
@@ -106,7 +111,7 @@ const parseSearchTerm = (term, validTld) => {
     const termArray = term.split('.')
     const tld = term.match(regex) ? term.match(regex)[0] : ''
     if (validTld) {
-      if (tld === 'eth' && [...termArray[termArray.length - 2]].length < 3) { // code-point length
+      if (topLevelDomainSupported(tld) && [...termArray[termArray.length - 2]].length < 1) { // code-point length
         return 'short'
       }
       return 'supported'
@@ -150,5 +155,7 @@ export {
   encodeContenthash,
   decodeContenthash,
   isValidContenthash,
-  getProtocolType
+  getProtocolType,
+  supportedTopLevelDomains,
+  topLevelDomainSupported
 }

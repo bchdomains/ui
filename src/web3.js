@@ -165,6 +165,10 @@ export function getNetworkProviderUrl(id) {
       return `https://rinkeby.infura.io/v3/90f210707d3c450f847659dc9a3436ea`
     case '5':
       return `https://goerli.infura.io/v3/90f210707d3c450f847659dc9a3436ea`
+    case '10000':
+      return `https://smartbch.fountainhead.cash/mainnet`
+    case '10001':
+      return `https://moeing.tech:9545`
     default:
       return `https://mainnet.infura.io/v3/90f210707d3c450f847659dc9a3436ea`
   }
@@ -238,7 +242,15 @@ export async function getNetworkId() {
 
 export async function getNetwork() {
   const provider = await getWeb3()
-  const network = await provider.getNetwork()
+
+  // patch smartbch nodes not reporting their network name
+  const network = {...await provider.getNetwork()}
+  if (network.chainId === 10000) {
+    network.name = "smartbch";
+  } else if (network.chainId === 10001) {
+    network.name = "smartbch-amber";
+  }
+
   return network
 }
 

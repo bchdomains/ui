@@ -72,7 +72,8 @@ export default class Registrar {
     legacyAuctionRegistrarAddress,
     controllerAddress,
     bulkRenewalAddress,
-    provider
+    provider,
+    topLevelDomain
   }) {
     checkArguments({
       registryAddress,
@@ -107,6 +108,7 @@ export default class Registrar {
     this.registryAddress = registryAddress
     this.bulkRenewal = bulkRenewal
     this.ENS = ENS
+    this.topLevelDomain = topLevelDomain
   }
 
   async getAddress(name) {
@@ -629,30 +631,32 @@ export default class Registrar {
   }
 }
 
-async function getEthResolver(ENS) {
-  const resolverAddr = await ENS.resolver(namehash('eth'))
+async function getEthResolver(ENS, topLevelDomain = 'eth') {
+  const resolverAddr = await ENS.resolver(namehash(topLevelDomain))
   const provider = await getProvider()
   return getResolverContract({ address: resolverAddr, provider })
 }
 
-export async function setupRegistrar(registryAddress) {
+export async function setupRegistrar(registryAddress, topLevelDomain = 'eth') {
   const provider = await getProvider()
   const ENS = getENSContract({ address: registryAddress, provider })
   const Resolver = await getEthResolver(ENS)
 
-  let ethAddress = await ENS.owner(namehash('eth'))
+  let ethAddress = await ENS.owner(namehash(topLevelDomain))
+
+  console.warn(topLevelDomain)
 
   let controllerAddress = await Resolver.interfaceImplementer(
-    namehash('eth'),
+    namehash(topLevelDomain),
     permanentRegistrarInterfaceId
   )
   let legacyAuctionRegistrarAddress = await Resolver.interfaceImplementer(
-    namehash('eth'),
+    namehash(topLevelDomain),
     legacyRegistrarInterfaceId
   )
 
   let bulkRenewalAddress = await Resolver.interfaceImplementer(
-    namehash('eth'),
+    namehash(topLevelDomain),
     bulkRenewalInterfaceId
   )
 
@@ -662,6 +666,7 @@ export async function setupRegistrar(registryAddress) {
     ethAddress,
     controllerAddress,
     bulkRenewalAddress,
-    provider
+    provider,
+    topLevelDomain
   })
 }
