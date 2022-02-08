@@ -1,6 +1,7 @@
 import { ethers } from 'ethers'
 import Web3 from 'web3'
 import { IFrameEthereumProvider } from '@ethvault/iframe-provider'
+import {contracts} from "./ens"
 
 let provider
 let legacyProvider
@@ -9,9 +10,31 @@ let readOnly = false
 let requested = false
 let address
 
+const defaultNetworkId = 10001
+const _getProvider = (networkId) => {
+  switch (networkId) {
+    case 10000:
+      return new ethers.providers.JsonRpcProvider(getNetworkProviderUrl(networkId),
+      {
+        name: "smartbch",
+        chainId: networkId,
+        ensAddress: contracts[networkId].registry
+      })
+    case 10001:
+      return new ethers.providers.JsonRpcProvider(getNetworkProviderUrl(networkId),
+      {
+        name: "smartbch-amber",
+        chainId: networkId,
+        ensAddress: contracts[networkId].registry
+      })
+    default:
+      return new ethers.getDefaultProvider('homestead', 'any')
+  }
+}
+
 function getDefaultProvider() {
-  legacyProvider = new Web3(getNetworkProviderUrl(1))
-  return new ethers.getDefaultProvider('homestead', 'any')
+  legacyProvider = new Web3(getNetworkProviderUrl(defaultNetworkId))
+  return _getProvider(defaultNetworkId)
 }
 
 function getJsonRpcProvider(providerOrUrl) {
@@ -156,7 +179,7 @@ export function isReadOnly() {
 }
 
 export function getNetworkProviderUrl(id) {
-  switch (id) {
+  switch (String(id)) {
     case '1':
       return `https://mainnet.infura.io/v3/90f210707d3c450f847659dc9a3436ea`
     case '3':
