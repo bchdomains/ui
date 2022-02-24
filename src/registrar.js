@@ -62,7 +62,7 @@ function checkArguments({
 // Add 10% buffer to handle price fructuation.
 // Any unused value will be sent back by the smart contract.
 function getBufferedPrice(price){
-  return price.mul(110).div(100)
+  return price //.mul(110).div(100)
 }
 
 export default class Registrar {
