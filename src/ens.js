@@ -7,7 +7,7 @@ import {
   getAccount,
   getSigner
 } from './web3'
-import { formatsByName } from '@ensdomains/address-encoder'
+import { formatsByName } from '@bchdomains/address-encoder'
 import { abi as ensContract } from '@ensdomains/contracts/abis/ens/ENS.json'
 
 import { decryptHashes } from './preimage'

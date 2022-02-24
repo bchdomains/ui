@@ -1,4 +1,4 @@
-import { formatsByName } from '@ensdomains/address-encoder'
+import { formatsByName } from '@bchdomains/address-encoder'
 
 describe('address-encoder integration', () => {
   it('encoder', () => {
