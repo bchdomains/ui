@@ -194,7 +194,8 @@ export default class Registrar {
       // Keep it as a separate call as this will throw exception for non existing domains
       ret.ownerOf = await Registrar.ownerOf(labelHash)
     } catch (e) {
-      console.log('Error getting permanent registrar entry', e)
+      // silence the error
+      // console.log('Error getting permanent registrar entry', e)
       return false
     } finally {
       return ret
