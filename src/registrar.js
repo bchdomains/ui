@@ -27,7 +27,7 @@ import { namehash } from './utils/namehash'
 
 import { interfaces } from './constants/interfaces'
 import { isEncodedLabelhash, labelhash } from './utils/labelhash'
-import { utils } from 'ethers'
+import { ethers, utils } from 'ethers'
 
 const {
   legacyRegistrar: legacyRegistrarInterfaceId,
@@ -125,7 +125,21 @@ export default class Registrar {
   }
 
   async getLegacyEntry(label) {
-    let legacyEntry
+    let legacyEntry = {
+      deedOwner: '0x0',
+      state: 0,
+      registrationDate: 0,
+      revealDate: 0,
+      value: 0,
+      highestBid: 0,
+      expiryTime: 0,
+      error: ''
+    }
+
+    if (this.legacyAuctionRegistrar.address === ethers.constants.AddressZero) {
+      return legacyEntry;
+    }
+
     try {
       const Registrar = this.legacyAuctionRegistrar
       let deedOwner = '0x0'
@@ -142,17 +156,9 @@ export default class Registrar {
         value: parseInt(entry[3]),
         highestBid: parseInt(entry[4])
       }
+      return legacyEntry;
     } catch (e) {
-      legacyEntry = {
-        deedOwner: '0x0',
-        state: 0,
-        registrationDate: 0,
-        revealDate: 0,
-        value: 0,
-        highestBid: 0,
-        expiryTime: 0,
-        error: e.message
-      }
+      legacyEntry.error = e.message
     }
     return legacyEntry
   }
@@ -644,8 +650,6 @@ export async function setupRegistrar(registryAddress, topLevelDomain = 'eth') {
   const Resolver = await getEthResolver(ENS)
 
   let ethAddress = await ENS.owner(namehash(topLevelDomain))
-
-  console.warn(topLevelDomain)
 
   let controllerAddress = await Resolver.interfaceImplementer(
     namehash(topLevelDomain),
