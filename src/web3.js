@@ -11,7 +11,7 @@ let requested = false
 let address
 
 const defaultNetworkId = 10000
-const _getProvider = (networkId) => {
+export const _getProvider = (networkId) => {
   switch (networkId) {
     case 10000:
       return new ethers.providers.JsonRpcProvider(getNetworkProviderUrl(networkId),
