@@ -10,7 +10,7 @@ let readOnly = false
 let requested = false
 let address
 
-const defaultNetworkId = 10001
+const defaultNetworkId = 10000
 export const _getProvider = (networkId) => {
   switch (networkId) {
     case 10000:
