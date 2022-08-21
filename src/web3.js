@@ -10,7 +10,7 @@ let readOnly = false
 let requested = false
 let address
 
-const defaultNetworkId = 10000
+const defaultNetworkId = 568
 export const _getProvider = (networkId) => {
   switch (networkId) {
     case 10000:
@@ -24,6 +24,20 @@ export const _getProvider = (networkId) => {
       return new ethers.providers.JsonRpcProvider(getNetworkProviderUrl(networkId),
       {
         name: "smartbch-amber",
+        chainId: networkId,
+        ensAddress: contracts[networkId].registry
+      })
+    case 2000:
+      return new ethers.providers.JsonRpcProvider(getNetworkProviderUrl(networkId),
+      {
+        name: "dogechain",
+        chainId: networkId,
+        ensAddress: contracts[networkId].registry
+      })
+    case 568:
+      return new ethers.providers.JsonRpcProvider(getNetworkProviderUrl(networkId),
+      {
+        name: "dogechain-testnet",
         chainId: networkId,
         ensAddress: contracts[networkId].registry
       })
@@ -192,6 +206,10 @@ export function getNetworkProviderUrl(id) {
       return `https://smartbch.fountainhead.cash/mainnet`
     case '10001':
       return `https://moeing.tech:9545`
+    case '2000':
+      return `https://rpc.dogechain.dog`
+    case '568':
+      return `https://rpc-testnet.dogechain.dog`
     default:
       return `https://mainnet.infura.io/v3/90f210707d3c450f847659dc9a3436ea`
   }
@@ -266,12 +284,16 @@ export async function getNetworkId() {
 export async function getNetwork() {
   const provider = await getWeb3()
 
-  // patch smartbch nodes not reporting their network name
+  // patch smartbch and doge nodes not reporting their network name
   const network = {...await provider.getNetwork()}
   if (network.chainId === 10000) {
     network.name = "smartbch";
   } else if (network.chainId === 10001) {
     network.name = "smartbch-amber";
+  } else if (network.chainId === 2000) {
+    network.name = "dogechain";
+  } else if (network.chainId === 568) {
+    network.name = "dogechain-testnet";
   }
 
   return network

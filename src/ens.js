@@ -71,6 +71,12 @@ export const contracts = {
   },
   10001: {
     registry: '0x32f1FBE59D771bdB7FB247FE97A635f50659202b'
+  },
+  2000: {
+    registry: '0x08850859CE6B62A39918c8B806AfbE3442fE7b0b',
+  },
+  568: {
+    registry: '0x08850859CE6B62A39918c8B806AfbE3442fE7b0b',
   }
 }
 
