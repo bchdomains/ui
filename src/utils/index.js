@@ -72,6 +72,9 @@ function validateName(name) {
   const nameArray = name.split('.')
   const hasEmptyLabels = nameArray.some(label => label.length == 0); 
   if (hasEmptyLabels) throw new Error('Domain cannot have empty labels')
+  if ([...new Intl.Segmenter().segment(name)].length != [...name].length) {
+    throw new Error('Invalid domain name');
+  }
   const normalizedArray = nameArray.map(label => {
     if(label === '[root]'){
       return label
