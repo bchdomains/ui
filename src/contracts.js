@@ -10,6 +10,8 @@ import {
   TestRegistrar as testRegistrarContract
 } from '@ensdomains/ens-contracts'
 
+import priceOracleContract from './contracts/NFTNativePriceOracle'
+
 import { abi as oldResolverContract } from '@ensdomains/contracts/abis/ens-022/PublicResolver.json'
 import { abi as dnsRegistrarContractOld } from '@ensdomains/contracts/abis/dnsregistrar/DNSRegistrar.json'
 import { abi as legacyAuctionRegistrarContract } from '@ensdomains/contracts/abis/ens/HashRegistrar'
@@ -63,6 +65,10 @@ function getBulkRenewalContract({ address, provider }) {
   return new Contract(address, bulkRenewalContract, provider)
 }
 
+function getPriceOracleContract({ address, provider }) {
+  return new Contract(address, priceOracleContract, provider)
+}
+
 export {
   getTestRegistrarContract,
   getReverseRegistrarContract,
@@ -75,5 +81,6 @@ export {
   getPermanentRegistrarControllerContract,
   getLegacyAuctionContract,
   getDeedContract,
-  getBulkRenewalContract
+  getBulkRenewalContract,
+  getPriceOracleContract,
 }

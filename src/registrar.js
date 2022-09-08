@@ -10,7 +10,8 @@ import {
   getLegacyAuctionContract,
   getDeedContract,
   getTestRegistrarContract,
-  getBulkRenewalContract
+  getBulkRenewalContract,
+  getPriceOracleContract,
 } from './contracts'
 
 import {
@@ -27,15 +28,16 @@ import { namehash } from './utils/namehash'
 
 import { interfaces } from './constants/interfaces'
 import { isEncodedLabelhash, labelhash } from './utils/labelhash'
-import { ethers, utils } from 'ethers'
+import { ethers, utils, BigNumber } from 'ethers'
 
 const {
   legacyRegistrar: legacyRegistrarInterfaceId,
   permanentRegistrar: permanentRegistrarInterfaceId,
   bulkRenewal: bulkRenewalInterfaceId,
   dnsRegistrar: dnsRegistrarInterfaceId,
-  dnssecClaimOld:dnssecClaimOldId,
-  dnssecClaimNew:dnssecClaimNewId
+  dnssecClaimOld: dnssecClaimOldId,
+  dnssecClaimNew: dnssecClaimNewId,
+  priceOracle: priceOracleInterfaceId
 } = interfaces
 
 // Renewal seem failing as it's not correctly estimating gas to return when buffer exceeds the renewal cost
@@ -45,7 +47,8 @@ function checkArguments({
   registryAddress,
   ethAddress,
   legacyAuctionRegistrarAddress,
-  provider
+  priceOracleAddress,
+  provider,
 }) {
   if (!registryAddress) throw 'No registry address given to Registrar class'
 
@@ -53,6 +56,8 @@ function checkArguments({
     throw 'No legacy auction address given to Registrar class'
 
   if (!ethAddress) throw 'No .eth address given to Registrar class'
+
+  if (!priceOracleAddress) throw 'Price Oracle Address not set'
 
   if (!provider) throw 'Provider is required for Registrar'
 
@@ -72,13 +77,15 @@ export default class Registrar {
     legacyAuctionRegistrarAddress,
     controllerAddress,
     bulkRenewalAddress,
+    priceOracleAddress,
     provider,
-    topLevelDomain
+    topLevelDomain,
   }) {
     checkArguments({
       registryAddress,
       ethAddress,
       legacyAuctionRegistrarAddress,
+      priceOracleAddress,
       provider
     })
 
@@ -100,6 +107,11 @@ export default class Registrar {
       provider
     })
 
+    const priceOracle = getPriceOracleContract({
+      address: priceOracleAddress,
+      provider
+    })
+
     const ENS = getENSContract({ address: registryAddress, provider })
 
     this.permanentRegistrar = permanentRegistrar
@@ -107,6 +119,7 @@ export default class Registrar {
     this.legacyAuctionRegistrar = legacyAuctionRegistrar
     this.registryAddress = registryAddress
     this.bulkRenewal = bulkRenewal
+    this.priceOracle = priceOracle
     this.ENS = ENS
     this.topLevelDomain = topLevelDomain
   }
@@ -312,9 +325,40 @@ export default class Registrar {
   }
 
   async getRentPrice(name, duration) {
-    const permanentRegistrarController = this.permanentRegistrarController
-    let price = await permanentRegistrarController.rentPrice(name, duration)
-    return price
+    const signer = await getSigner()
+    const permanentRegistrarController = this.permanentRegistrarController.connect(signer)
+    try {
+      await permanentRegistrarController.rentPrice(name, duration)
+    } catch {
+      return undefined
+    }
+  }
+
+  async getPriceBreakdown(name, duration) {
+    if (await this.priceOracle.supportsInterface("0xf67153a1")) {
+      const signer = await getSigner()
+      const response = await this.priceOracle.connect(signer).getNamePriceBreakdown(name, 0, duration)
+      return {
+        isEligibleForDiscount: response[0],
+        canRegisterName: response[1],
+        basePrice: response[2],
+        discountedPrice: response[3],
+        collections: response[4],
+        nftAmount: response[5],
+        requiredNftAmount: response[6],
+      }
+    }
+
+    const price = await this.priceOracle.price(name, 0, duration)
+    return {
+      isEligibleForDiscount: false,
+      canRegisterName: true,
+      basePrice: price,
+      discountedPrice: price,
+      collections: [],
+      nftAmount: BigNumber.from(0),
+      requiredNftAmount: BigNumber.from(0),
+    }
   }
 
   async getRentPrices(labels, duration) {
@@ -665,12 +709,18 @@ export async function setupRegistrar(registryAddress, topLevelDomain = 'eth') {
     bulkRenewalInterfaceId
   )
 
+  let priceOracleAddress = await Resolver.interfaceImplementer(
+    namehash(topLevelDomain),
+    priceOracleInterfaceId
+  )
+
   return new Registrar({
     registryAddress,
     legacyAuctionRegistrarAddress,
     ethAddress,
     controllerAddress,
     bulkRenewalAddress,
+    priceOracleAddress,
     provider,
     topLevelDomain
   })

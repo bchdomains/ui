@@ -6,5 +6,6 @@ export const interfaces = {
   dnsRegistrar: '0x1aa2e641',
   bulkRenewal: '0x3150bfba',
   dnssecClaimOld:'0x1aa2e641',
-  dnssecClaimNew:'0x17d8f49b'
+  dnssecClaimNew:'0x17d8f49b',
+  priceOracle: '0x5e75f6a9',
 }
