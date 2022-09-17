@@ -207,7 +207,7 @@ export function getNetworkProviderUrl(id) {
     case '10001':
       return `https://moeing.tech:9545`
     case '2000':
-      return `https://rpc.dogmoney.money/public/full`
+      return `https://rpc.yodeswap.dog`
     case '568':
       return `https://rpc-testnet.dogechain.dog`
     default:

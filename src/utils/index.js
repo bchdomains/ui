@@ -70,9 +70,13 @@ const mergeLabels = (labels1, labels2) =>
 
 function validateName(name) {
   const nameArray = name.split('.')
-  const hasEmptyLabels = nameArray.some(label => label.length == 0); 
+  const hasEmptyLabels = nameArray.some(label => label.length == 0);
   if (hasEmptyLabels) throw new Error('Domain cannot have empty labels')
-  if ([...new Intl.Segmenter().segment(name)].length != [...name].length) {
+  if (Intl.Segmenter === undefined) {
+    if (name.indexOf('\u200D') >= 0 || name.indexOf('\uFE0F') >= 0) {
+      throw new Error('Invalid domain name');
+    }
+  } else if ([...new Intl.Segmenter().segment(name)].length != [...name].length) {
     throw new Error('Invalid domain name');
   }
   const normalizedArray = nameArray.map(label => {
