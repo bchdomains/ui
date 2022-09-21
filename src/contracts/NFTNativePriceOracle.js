@@ -142,19 +142,6 @@ export default
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "ORACLE_ID",
-    "outputs": [
-      {
-        "internalType": "bytes4",
-        "name": "",
-        "type": "bytes4"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "address",
@@ -187,7 +174,13 @@ export default
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
+      }
+    ],
     "name": "countNFTs",
     "outputs": [
       {
@@ -255,28 +248,9 @@ export default
         "type": "uint256"
       },
       {
-        "internalType": "uint256",
-        "name": "nftAmount",
-        "type": "uint256"
-      }
-    ],
-    "name": "getDiscountedPrice",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "basePrice",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
       }
     ],
     "name": "getDiscountedPrice",
@@ -319,22 +293,17 @@ export default
         "internalType": "uint256",
         "name": "duration",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
       }
     ],
     "name": "getNamePriceBreakdown",
     "outputs": [
       {
         "components": [
-          {
-            "internalType": "bool",
-            "name": "isEligibleForDiscount",
-            "type": "bool"
-          },
-          {
-            "internalType": "bool",
-            "name": "canRegisterName",
-            "type": "bool"
-          },
           {
             "internalType": "uint256",
             "name": "basePrice",
@@ -346,11 +315,6 @@ export default
             "type": "uint256"
           },
           {
-            "internalType": "address[]",
-            "name": "collections",
-            "type": "address[]"
-          },
-          {
             "internalType": "uint256",
             "name": "nftAmount",
             "type": "uint256"
@@ -359,6 +323,26 @@ export default
             "internalType": "uint256",
             "name": "requiredNftAmount",
             "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "isEligibleForDiscount",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "canRegisterName",
+            "type": "bool"
+          },
+          {
+            "internalType": "address[]",
+            "name": "collections",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "discounts",
+            "type": "uint256[]"
           }
         ],
         "internalType": "struct PriceBreakdown",
@@ -462,6 +446,11 @@ export default
         "internalType": "uint256",
         "name": "duration",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
       }
     ],
     "name": "price",

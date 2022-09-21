@@ -8,4 +8,6 @@ export const interfaces = {
   dnssecClaimOld:'0x1aa2e641',
   dnssecClaimNew:'0x17d8f49b',
   priceOracle: '0x5e75f6a9',
+  nftRegistrarController: '0xe3a219f7',
+  nftPriceOracle: '0x852ae872',
 }

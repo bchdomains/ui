@@ -37,7 +37,9 @@ const {
   dnsRegistrar: dnsRegistrarInterfaceId,
   dnssecClaimOld: dnssecClaimOldId,
   dnssecClaimNew: dnssecClaimNewId,
-  priceOracle: priceOracleInterfaceId
+  priceOracle: priceOracleInterfaceId,
+  nftPriceOracle: nftPriceOracleInterfaceId,
+  nftRegistrarController: nftRegistrarControllerInterfaceId,
 } = interfaces
 
 // Renewal seem failing as it's not correctly estimating gas to return when buffer exceeds the renewal cost
@@ -80,6 +82,8 @@ export default class Registrar {
     priceOracleAddress,
     provider,
     topLevelDomain,
+    nftPriceOracleAddress,
+    nftRegistrarControllerAddress
   }) {
     checkArguments({
       registryAddress,
@@ -107,10 +111,20 @@ export default class Registrar {
       provider
     })
 
-    const priceOracle = getPriceOracleContract({
+    const priceOracle = priceOracleAddress != ethers.constants.AddressZero ? getPriceOracleContract({
       address: priceOracleAddress,
       provider
-    })
+    }) : undefined
+
+    const nftPriceOracle = nftPriceOracleAddress != ethers.constants.AddressZero ? getPriceOracleContract({
+      address: nftPriceOracleAddress,
+      provider
+    }) : undefined
+
+    const nftRegistrarController = nftRegistrarControllerAddress != ethers.constants.AddressZero ? getPermanentRegistrarControllerContract({
+      address: nftRegistrarControllerAddress,
+      provider
+    }) : undefined
 
     const ENS = getENSContract({ address: registryAddress, provider })
 
@@ -120,6 +134,8 @@ export default class Registrar {
     this.registryAddress = registryAddress
     this.bulkRenewal = bulkRenewal
     this.priceOracle = priceOracle
+    this.nftPriceOracle = nftPriceOracle
+    this.nftRegistrarController = nftRegistrarController
     this.ENS = ENS
     this.topLevelDomain = topLevelDomain
   }
@@ -325,39 +341,45 @@ export default class Registrar {
   }
 
   async getRentPrice(name, duration) {
-    const signer = await getSigner()
-    const permanentRegistrarController = this.permanentRegistrarController.connect(signer)
+    const permanentRegistrarController = this.permanentRegistrarController
+    const nftRegistrarController = this.nftRegistrarController
     try {
-      await permanentRegistrarController.rentPrice(name, duration)
+      if (nftRegistrarController) {
+        return await nftRegistrarController.rentPrice(name, duration)
+      }
+      return await permanentRegistrarController.rentPrice(name, duration)
     } catch {
       return undefined
     }
   }
 
   async getPriceBreakdown(name, duration) {
-    if (await this.priceOracle.supportsInterface("0xf67153a1")) {
+    if (this.nftPriceOracle) {
       const signer = await getSigner()
-      const response = await this.priceOracle.connect(signer).getNamePriceBreakdown(name, 0, duration)
+      const address = (signer || {}).getAddress ? await signer.getAddress() : ethers.constants.AddressZero
+      const response = await this.nftPriceOracle.getNamePriceBreakdown(name, 0, duration, address)
       return {
-        isEligibleForDiscount: response[0],
-        canRegisterName: response[1],
-        basePrice: response[2],
-        discountedPrice: response[3],
-        collections: response[4],
-        nftAmount: response[5],
-        requiredNftAmount: response[6],
+        basePrice: response[0],
+        discountedPrice: response[1],
+        nftAmount: response[2],
+        requiredNftAmount: response[3],
+        isEligibleForDiscount: response[4],
+        canRegisterName: response[5],
+        collections: response[6],
+        discounts: response[7],
       }
     }
 
-    const price = await this.priceOracle.price(name, 0, duration)
+    const price = await this.getRentPrice(name, duration)
     return {
-      isEligibleForDiscount: false,
-      canRegisterName: true,
       basePrice: price,
       discountedPrice: price,
-      collections: [],
       nftAmount: BigNumber.from(0),
       requiredNftAmount: BigNumber.from(0),
+      isEligibleForDiscount: false,
+      canRegisterName: true,
+      collections: [],
+      discounts: [],
     }
   }
 
@@ -714,6 +736,16 @@ export async function setupRegistrar(registryAddress, topLevelDomain = 'eth') {
     priceOracleInterfaceId
   )
 
+  let nftPriceOracleAddress = await Resolver.interfaceImplementer(
+    namehash(topLevelDomain),
+    nftPriceOracleInterfaceId
+  )
+
+  let nftRegistrarControllerAddress = await Resolver.interfaceImplementer(
+    namehash(topLevelDomain),
+    nftRegistrarControllerInterfaceId
+  )
+
   return new Registrar({
     registryAddress,
     legacyAuctionRegistrarAddress,
@@ -722,6 +754,8 @@ export async function setupRegistrar(registryAddress, topLevelDomain = 'eth') {
     bulkRenewalAddress,
     priceOracleAddress,
     provider,
-    topLevelDomain
+    topLevelDomain,
+    nftPriceOracleAddress,
+    nftRegistrarControllerAddress,
   })
 }
