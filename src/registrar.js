@@ -341,16 +341,19 @@ export default class Registrar {
   }
 
   async getRentPrice(name, duration) {
-    const permanentRegistrarController = this.permanentRegistrarController
-    const nftRegistrarController = this.nftRegistrarController
-    try {
-      if (nftRegistrarController) {
-        return await nftRegistrarController.rentPrice(name, duration)
-      }
-      return await permanentRegistrarController.rentPrice(name, duration)
-    } catch {
-      return undefined
-    }
+    // const permanentRegistrarController = this.permanentRegistrarController
+    // const nftRegistrarController = this.nftRegistrarController
+    // try {
+    //   if (nftRegistrarController) {
+    //     return await nftRegistrarController.rentPrice(name, duration)
+    //   }
+    //   return await permanentRegistrarController.rentPrice(name, duration)
+    // } catch {
+    //   return undefined
+    // }
+    const priceBreakdown = await this.getPriceBreakdown(name, duration)
+    console.warn(priceBreakdown.discountedPrice.toString())
+    return priceBreakdown.discountedPrice
   }
 
   async getPriceBreakdown(name, duration) {
@@ -450,6 +453,7 @@ export default class Registrar {
   }
 
   async register(label, duration, secret) {
+    console.log(123)
     const permanentRegistrarControllerWithoutSigner = this
       .permanentRegistrarController
     const signer = await getSigner()
@@ -458,6 +462,7 @@ export default class Registrar {
     )
     const account = await getAccount()
     const price = await this.getRentPrice(label, duration)
+    console.log(price.toString())
     const priceWithBuffer = getBufferedPrice(price)
     const resolverAddr = await this.getAddress('resolver.eth')
     if (parseInt(resolverAddr, 16) === 0) {
