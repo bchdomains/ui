@@ -19,7 +19,7 @@ import { namehash } from './namehash'
 
 //import { checkLabelHash } from '../updaters/preImageDB'
 
-const supportedTopLevelDomains = ['eth', 'bch', 'doge', 'dc']
+const supportedTopLevelDomains = ['eth', 'bch', 'doge', 'dc', 'ethw']
 const topLevelDomainSupported = (tld) => {
   return tld && supportedTopLevelDomains.indexOf(tld.toLowerCase()) !== -1;
 }

@@ -293,7 +293,7 @@ export async function getNetworkId() {
 export async function getNetwork() {
   const provider = await getWeb3()
 
-  // patch smartbch and doge nodes not reporting their network name
+  // patch networks not reporting their network name
   const network = {...await provider.getNetwork()}
   if (network.chainId === 10000) {
     network.name = "smartbch";
