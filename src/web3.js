@@ -10,7 +10,7 @@ let readOnly = false
 let requested = false
 let address
 
-const defaultNetworkId = 2000
+const defaultNetworkId = 10001
 export const _getProvider = (networkId) => {
   switch (networkId) {
     case 10000:
@@ -20,10 +20,17 @@ export const _getProvider = (networkId) => {
         chainId: networkId,
         ensAddress: contracts[networkId].registry
       })
+    // case 10001:
+    //   return new ethers.providers.JsonRpcProvider(getNetworkProviderUrl(networkId),
+    //   {
+    //     name: "smartbch-amber",
+    //     chainId: networkId,
+    //     ensAddress: contracts[networkId].registry
+    //   })
     case 10001:
       return new ethers.providers.JsonRpcProvider(getNetworkProviderUrl(networkId),
       {
-        name: "smartbch-amber",
+        name: "ethpow",
         chainId: networkId,
         ensAddress: contracts[networkId].registry
       })
@@ -204,8 +211,10 @@ export function getNetworkProviderUrl(id) {
       return `https://goerli.infura.io/v3/90f210707d3c450f847659dc9a3436ea`
     case '10000':
       return `https://smartbch.fountainhead.cash/mainnet`
+    // case '10001':
+    //   return `https://moeing.tech:9545`
     case '10001':
-      return `https://moeing.tech:9545`
+      return `https://mainnet.ethereumpow.org`
     case '2000':
       return `https://rpc.yodeswap.dog`
     case '568':
@@ -289,7 +298,8 @@ export async function getNetwork() {
   if (network.chainId === 10000) {
     network.name = "smartbch";
   } else if (network.chainId === 10001) {
-    network.name = "smartbch-amber";
+    // network.name = "smartbch-amber";
+    network.name = "ethpow";
   } else if (network.chainId === 2000) {
     network.name = "dogechain";
   } else if (network.chainId === 568) {
