@@ -207,11 +207,12 @@ export default class Registrar {
       const labelHash = labelhash(label)
 
       // Returns true if name is available
-      if (isEncodedLabelhash(label)) {
-        getAvailable = Registrar.available(labelHash)
-      } else {
-        getAvailable = RegistrarController.available(label)
-      }
+      // if (isEncodedLabelhash(label)) {
+      //   getAvailable = Registrar.available(labelHash)
+      // } else {
+      //   getAvailable = RegistrarController.available(label)
+      // }
+      getAvailable = Registrar.available(labelHash)
 
       const [available, nameExpires, gracePeriod] = await Promise.all([
         getAvailable,
