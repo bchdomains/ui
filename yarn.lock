@@ -934,10 +934,10 @@
     "@babel/helper-validator-identifier" "^7.14.9"
     to-fast-properties "^2.0.0"
 
-"@bchdomains/address-encoder@^0.2.17":
-  version "0.2.17"
-  resolved "https://registry.yarnpkg.com/@bchdomains/address-encoder/-/address-encoder-0.2.17.tgz#e316dcb938fb7c948fd8f5f9e46aea83dbfa3a19"
-  integrity sha512-CQ2wgwhOgGu70hU1Oq8wzArljP8nSzPHmEZY8i2E8SqjV4iEp30SoYMeeYzI6/F9yj93xpQHS0QCq/jC4uSo/A==
+"@bchdomains/address-encoder@^0.2.18":
+  version "0.2.18"
+  resolved "https://registry.yarnpkg.com/@bchdomains/address-encoder/-/address-encoder-0.2.18.tgz#371fd853177d284fed5bd378e28f77f4905fa339"
+  integrity sha512-EKCRq7UW9fjDsAqT2XDAKmX697B1tEs9NzjA8UlGCUawzmVFdwnCxoa3RbYxcJc6wDNFnmYDq8VpKiMtavSsFw==
   dependencies:
     bech32 "^2.0.0"
     blakejs "^1.1.0"

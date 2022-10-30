@@ -214,7 +214,7 @@ export function getNetworkProviderUrl(id) {
     // case '10001':
     //   return `https://moeing.tech:9545`
     case '10001':
-      return `https://mainnet.ethereumpow.org`
+      return `https://uniwnode.com`
     case '2000':
       return `https://rpc.yodeswap.dog`
     case '568':
