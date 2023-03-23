@@ -216,7 +216,7 @@ export function getNetworkProviderUrl(id) {
     case '10001':
       return `https://uniwnode.com`
     case '2000':
-      return `https://rpc.yodeswap.dog`
+      return `https://rpc.dogechain.dog`
     case '568':
       return `https://rpc-testnet.dogechain.dog`
     default:
